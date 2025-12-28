@@ -3,7 +3,12 @@ const path = require('path');
 const initSqlJs = require('sql.js');
 
 class DatabaseManager {
-  constructor(dbPath = './data.db') {
+  constructor(dbPath = null) {
+    // Use /tmp for Vercel, otherwise use current directory
+    if (!dbPath) {
+      const tmpDir = process.env.VERCEL ? '/tmp' : '.';
+      dbPath = path.join(tmpDir, 'data.db');
+    }
     this.dbPath = dbPath;
     this.db = null;
     this.inTransaction = false;
@@ -11,15 +16,25 @@ class DatabaseManager {
 
   async init() {
     const SQL = await initSqlJs();
-    
-    // Load existing database if it exists
-    if (fs.existsSync(this.dbPath)) {
-      const buffer = fs.readFileSync(this.dbPath);
-      this.db = new SQL.Database(buffer);
-    } else {
+        
+    try {
+      if (fs.existsSync(this.dbPath)) {
+        try {
+          const buffer = fs.readFileSync(this.dbPath);
+          this.db = new SQL.Database(buffer);
+          console.log('Loaded existing database');
+        } catch (e) {
+          console.warn('Failed to load, using new database:', e.message);
+          this.db = new SQL.Database();
+        }
+      } else {
+        this.db = new SQL.Database();
+      }
+    } catch (e) {
+      console.warn('Using in-memory database:', e.message);
       this.db = new SQL.Database();
     }
-    
+        
     this.initializeTables();
     return this;
   }
@@ -154,9 +169,15 @@ class DatabaseManager {
   }
 
   save() {
-    if (!this.inTransaction) {
-      const data = this.db.export();
-      fs.writeFileSync(this.dbPath, data);
+    try {
+      if (!this.inTransaction) {
+        const data = this.db.export();
+        const buffer = Buffer.from(data);
+        fs.writeFileSync(this.dbPath, buffer);
+      }
+    } catch (error) {
+      // Silently fail on read-only filesystems (Vercel)
+      // Database still works in-memory
     }
   }
 
