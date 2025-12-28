@@ -102,8 +102,12 @@ app.get('/api/stats', (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Database initialized successfully`);
-});
+// Start server locally; export app on Vercel/serverless
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Database initialized successfully`);
+  });
+}

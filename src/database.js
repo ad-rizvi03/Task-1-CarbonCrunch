@@ -15,7 +15,12 @@ class DatabaseManager {
   }
 
   async init() {
-    const SQL = await initSqlJs();
+    const SQL = await initSqlJs({
+      locateFile: (file) => {
+        // Ensure the WASM file is found in serverless environments
+        return path.join(process.cwd(), 'node_modules', 'sql.js', 'dist', file);
+      }
+    });
         
     try {
       if (fs.existsSync(this.dbPath)) {
