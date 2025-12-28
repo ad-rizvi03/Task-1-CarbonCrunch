@@ -1,0 +1,17 @@
+{
+  "name": "fault-tolerant-data-processing",
+  "version": "1.0.0",
+  "description": "A fault-tolerant data processing system with idempotency and deduplication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["data-processing", "fault-tolerant", "idempotency"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.8.0"
+  }
+}

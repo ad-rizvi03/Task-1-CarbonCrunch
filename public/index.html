@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fault-Tolerant Data Processing System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Data Processing System</h1>
+            <p class="subtitle">Fault-tolerant event ingestion with idempotency</p>
+        </header>
+
+        <div class="grid">
+            <!-- Event Submission Panel -->
+            <div class="panel">
+                <h2>📤 Submit Event</h2>
+                <div class="form-group">
+                    <label for="eventInput">Raw Event JSON:</label>
+                    <textarea id="eventInput" rows="10" placeholder='Example:
+{
+  "source": "client_A",
+  "payload": {
+    "metric": "revenue",
+    "amount": "1200",
+    "timestamp": "2024/01/01"
+  }
+}'></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="simulateFailure">
+                        <span>🔥 Simulate Database Failure</span>
+                    </label>
+                    <small class="help-text">Test retry behavior and partial failure handling</small>
+                </div>
+
+                <div class="button-group">
+                    <button id="submitBtn" class="btn btn-primary">Submit Event</button>
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button id="loadSampleBtn" class="btn btn-secondary">Load Sample</button>
+                </div>
+
+                <div id="submitResult" class="result-box" style="display: none;"></div>
+            </div>
+
+            <!-- Statistics Panel -->
+            <div class="panel">
+                <h2>📈 Statistics</h2>
+                <div id="statsContainer">
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statProcessed">0</div>
+                            <div class="stat-label">Processed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statFailed">0</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statDuplicates">0</div>
+                            <div class="stat-label">Duplicates</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTotal">0</div>
+                            <div class="stat-label">Total Received</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="refreshStatsBtn" class="btn btn-secondary btn-sm">Refresh Stats</button>
+            </div>
+        </div>
+
+        <!-- Events Table -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>✅ Successfully Processed Events</h2>
+                <button id="refreshEventsBtn" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+            <div class="table-container">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Metric</th>
+                            <th>Amount</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                            <th>Hash</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">No events yet. Submit an event to get started.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Failed Events Table -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>❌ Failed Events</h2>
+                <button id="refreshFailedBtn" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+            <div class="table-container">
+                <table id="failedTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Error Type</th>
+                            <th>Error Message</th>
+                            <th>Failed At</th>
+                            <th>Raw Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="failedTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">No failed events.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Aggregations Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>📊 Aggregated Results</h2>
+                <button id="refreshAggBtn" class="btn btn-secondary btn-sm">Refresh</button>
+            </div>
+            
+            <div class="agg-section">
+                <h3>Overall Summary</h3>
+                <div id="summaryContainer" class="agg-content">
+                    <p class="empty-state">No data available</p>
+                </div>
+            </div>
+
+            <div class="agg-section">
+                <h3>By Client</h3>
+                <div id="byClientContainer" class="agg-content">
+                    <p class="empty-state">No data available</p>
+                </div>
+            </div>
+
+            <div class="agg-section">
+                <h3>By Metric</h3>
+                <div id="byMetricContainer" class="agg-content">
+                    <p class="empty-state">No data available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
